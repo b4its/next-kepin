@@ -2,12 +2,9 @@
 
 import {
   BadgeCheck,
-  Bell,
   ChevronsUpDown,
-  CreditCard,
   LogOut,
-  Sparkles,
-  Loader2, // Tambahkan loader untuk UX
+  Loader2,
 } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
@@ -32,38 +29,38 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar"
 
-export function NavUser({
-  user,
-}: {
+// Definisikan Interface untuk kejelasan Props
+interface NavUserProps {
   user: {
-    name: string
-    email: string
-    avatar: string
+    id: string;
+    name: string;
+    email: string;
+    avatar: string;
   }
-}) {
+}
+
+export function NavUser({ user }: NavUserProps) {
   const { isMobile } = useSidebar()
   const router = useRouter()
   const [isLoggingOut, setIsLoggingOut] = useState(false)
 
-  // Fungsi Logout
   const handleLogout = async () => {
     try {
       setIsLoggingOut(true)
       
       const response = await fetch("http://localhost:8000/api/v1/auth/logout", {
-        method: "POST", // Sesuaikan dengan route Axum Anda (POST biasanya lebih standar untuk logout)
-        credentials: "include", // WAJIB agar browser mengirimkan cookie yang ingin dihapus
+        method: "POST", 
+        credentials: "include", 
       })
 
       if (response.ok) {
-        // Hapus cache client-side dan arahkan ke login
-        router.push("/login")
-        router.refresh()
+        // Redirect ke login dan segarkan state aplikasi
+        window.location.href = "/login"; 
       } else {
-        console.error("Gagal logout")
+        console.error("Logout failed server-side");
       }
     } catch (error) {
-      console.error("Error saat logout:", error)
+      console.error("Logout Network Error:", error);
     } finally {
       setIsLoggingOut(false)
     }
@@ -80,19 +77,19 @@ export function NavUser({
             >
               <Avatar className="h-8 w-8 rounded-lg">
                 <AvatarImage src={user.avatar} alt={user.name} />
-                <AvatarFallback className="rounded-lg">
-                  {user.name?.substring(0, 2).toUpperCase() || "CN"}
+                <AvatarFallback className="rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
+                  {user.name?.substring(0, 2).toUpperCase() || "US"}
                 </AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-medium">{user.name}</span>
-                <span className="truncate text-xs">{user.email}</span>
+                <span className="truncate text-xs text-muted-foreground">{user.email}</span>
               </div>
               <ChevronsUpDown className="ml-auto size-4" />
             </SidebarMenuButton>
           </DropdownMenuTrigger>
           <DropdownMenuContent
-            className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
+            className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
             side={isMobile ? "bottom" : "right"}
             align="end"
             sideOffset={4}
@@ -101,32 +98,30 @@ export function NavUser({
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <Avatar className="h-8 w-8 rounded-lg">
                   <AvatarImage src={user.avatar} alt={user.name} />
-                  <AvatarFallback className="rounded-lg">
-                    {user.name?.substring(0, 2).toUpperCase() || "CN"}
+                  <AvatarFallback className="rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
+                    {user.name?.substring(0, 2).toUpperCase() || "US"}
                   </AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-medium">{user.name}</span>
-                  <span className="truncate text-xs">{user.email}</span>
+                  <span className="truncate text-xs text-muted-foreground">{user.email}</span>
                 </div>
               </div>
             </DropdownMenuLabel>
-            <DropdownMenuSeparator />
-
+            
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <BadgeCheck />
+              <DropdownMenuItem className="cursor-pointer">
+                <BadgeCheck className="mr-2 h-4 w-4" />
                 Account
               </DropdownMenuItem>
-
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            {/* Tombol Logout yang difungsikan */}
+            
             <DropdownMenuItem 
               onClick={handleLogout} 
               disabled={isLoggingOut}
-              className="text-destructive focus:text-destructive cursor-pointer"
+              className="text-destructive focus:text-destructive focus:bg-destructive/10 cursor-pointer"
             >
               {isLoggingOut ? (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />

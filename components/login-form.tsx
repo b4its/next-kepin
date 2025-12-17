@@ -48,7 +48,7 @@ export function LoginForm({
       }
 
       // Berhasil: Refresh agar middleware/sidebar mendeteksi cookie baru
-      router.push("/dashboard"); 
+      router.push("/panel/dashboard"); 
       router.refresh();
     } catch (error: any) {
       alert(error.message);
