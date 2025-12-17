@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from 'next/link';
+import { Eye, EyeOff, Loader2 } from "lucide-react"; // Ikon untuk password & loading
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -21,6 +22,7 @@ export function LoginForm({
 }: React.ComponentProps<"div">) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false); // State Show/Hide
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -34,22 +36,20 @@ export function LoginForm({
       const response = await fetch("http://localhost:8000/api/v1/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        // PENTING: Mengizinkan browser menyimpan cookie dari backend Axum
+        credentials: "include", 
         body: JSON.stringify({ email, password }),
       });
 
-      const data = await response.json();
+      const message = await response.text();
 
       if (!response.ok) {
-        throw new Error(data.message || "Login gagal");
+        throw new Error(message || "Login gagal");
       }
 
-      // Simpan token jika backend mengembalikannya
-      if (data.token) {
-        localStorage.setItem("token", data.token);
-      }
-
-      alert("Login Berhasil!");
-      router.push("/dashboard"); // Ganti ke halaman tujuan setelah login
+      // Berhasil: Refresh agar middleware/sidebar mendeteksi cookie baru
+      router.push("/dashboard"); 
+      router.refresh();
     } catch (error: any) {
       alert(error.message);
     } finally {
@@ -59,7 +59,7 @@ export function LoginForm({
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
-      <Card className="overflow-hidden p-0">
+      <Card className="overflow-hidden p-0 border-none shadow-lg">
         <CardContent className="grid p-0 md:grid-cols-2">
           <form className="p-6 md:p-8" onSubmit={onSubmit}>
             <FieldGroup>
@@ -69,70 +69,102 @@ export function LoginForm({
                   Login to your Oryphem account
                 </p>
               </div>
+
+              {/* Input Email */}
               <Field>
                 <FieldLabel htmlFor="email">Email</FieldLabel>
                 <Input
                   id="email"
-                  name="email" // Penting untuk FormData
+                  name="email"
                   type="email"
-                  placeholder="m@example.com"
+                  placeholder="name@example.com"
                   required
+                  disabled={isLoading}
                 />
               </Field>
+
+              {/* Input Password dengan Toggle Show/Hide */}
               <Field>
                 <div className="flex items-center">
                   <FieldLabel htmlFor="password">Password</FieldLabel>
-                  <a
-                    href="#"
+                  <Link
+                    href="/forgot-password"
                     className="ml-auto text-sm underline-offset-2 hover:underline"
                   >
-                    Forgot your password?
-                  </a>
+                    Forgot password?
+                  </Link>
                 </div>
-                <Input id="password" name="password" type="password" required />
+                <div className="relative">
+                  <Input 
+                    id="password" 
+                    name="password" 
+                    type={showPassword ? "text" : "password"} 
+                    required 
+                    disabled={isLoading}
+                    className="pr-10" // Ruang untuk ikon
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground focus:outline-none"
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-4 w-4" />
+                    ) : (
+                      <Eye className="h-4 w-4" />
+                    )}
+                  </button>
+                </div>
               </Field>
-              <Field className='grid grid-cols-2 gap-2'>
-                <Button asChild variant='ghost' type="button">
+
+              <Field className='grid grid-cols-2 gap-4'>
+                <Button asChild variant='outline' type="button" disabled={isLoading}>
                   <Link href="/">Back</Link>
                 </Button>
                 <Button type="submit" disabled={isLoading}>
-                  {isLoading ? "Loading..." : "Login"}
+                  {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  {isLoading ? "Authenticating..." : "Login"}
                 </Button>
               </Field>
-              <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">
+
+              <FieldSeparator className="text-xs text-muted-foreground uppercase">
                 Or continue with
               </FieldSeparator>
-              <Field className="grid grid-cols-2 gap-2">
-                <Button variant="outline" type="button">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="w-5 h-5">
+
+              <div className="grid grid-cols-2 gap-4">
+                <Button variant="outline" type="button" className="w-full">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="w-4 h-4 mr-2">
                     <path d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0 5.867 0 .307 5.387.307 12s5.56 12 12.173 12c3.573 0 6.267-1.173 8.373-3.36 2.16-2.16 2.84-5.213 2.84-7.667 0-.76-.053-1.467-.173-2.053H12.48z" fill="currentColor" />
                   </svg>
-                  <span className="sr-only">Login with Google</span>
+                  Google
                 </Button>
-                <Button variant="outline" type="button">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="w-5 h-5">
-                      <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12" fill="currentColor" />
-                    </svg>
-                  <span className="sr-only">Login with Github</span>
+                <Button variant="outline" type="button" className="w-full">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="w-4 h-4 mr-2">
+                    <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12" fill="currentColor" />
+                  </svg>
+                  Github
                 </Button>
-              </Field>
-              <FieldDescription className="text-center">
-                Don&apos;t have an account? <Link href="/signup" className="underline">Sign up</Link>
+              </div>
+
+              <FieldDescription className="text-center pt-2">
+                Don&apos;t have an account? <Link href="/signup" className="font-semibold text-primary underline underline-offset-4">Sign up</Link>
               </FieldDescription>
             </FieldGroup>
           </form>
+
+          {/* Sisi Gambar */}
           <div className="bg-muted relative hidden md:block">
             <img
-              src="/images/image5.jpg"
-              alt="Image"
-              className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
+              src="/images/image4.jpg"
+              alt="Login Visual"
+              className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.4]"
             />
           </div>
         </CardContent>
       </Card>
-      <FieldDescription className="px-6 text-center">
-        By clicking continue, you agree to our <a href="#">Terms of Service</a>{" "}
-        and <a href="#">Privacy Policy</a>.
+      
+      <FieldDescription className="px-6 text-center text-xs text-muted-foreground">
+        By clicking continue, you agree to our <a href="#" className="underline">Terms</a> and <a href="#" className="underline">Privacy Policy</a>.
       </FieldDescription>
     </div>
   )

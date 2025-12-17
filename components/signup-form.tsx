@@ -22,44 +22,37 @@ export function SignupForm({
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
 
-  async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    setIsLoading(true);
+async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
+  event.preventDefault();
+  setIsLoading(true);
 
-    const formData = new FormData(event.currentTarget);
-    const name = formData.get("name");
-    const email = formData.get("email");
-    const password = formData.get("password");
-    const confirmPassword = formData.get("confirm-password");
+  const formData = new FormData(event.currentTarget);
+  const email = formData.get("email");
+  const password = formData.get("password");
 
-    // Validasi Sederhana
-    if (password !== confirmPassword) {
-      alert("Password dan Konfirmasi Password tidak cocok!");
-      setIsLoading(false);
-      return;
+  try {
+    const response = await fetch("http://localhost:8000/api/v1/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      // PENTING: credentials "include" membuat browser menyimpan cookie dari response Set-Cookie
+      credentials: "include", 
+      body: JSON.stringify({ email, password }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(errorText || "Login gagal");
     }
 
-    try {
-      const response = await fetch("http://localhost:8000/api/v1/auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, password }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || "Registrasi gagal");
-      }
-
-      alert("Akun berhasil dibuat! Silahkan untuk login.");
-      router.push("/login");
-    } catch (error: any) {
-      alert(error.message);
-    } finally {
-      setIsLoading(false);
-    }
+    // Berhasil: Browser sekarang sudah menyimpan cookie (session/token)
+    router.push("/dashboard"); 
+    router.refresh();
+  } catch (error: any) {
+    alert(error.message);
+  } finally {
+    setIsLoading(false);
   }
+}
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
