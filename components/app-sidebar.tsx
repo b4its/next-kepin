@@ -7,8 +7,9 @@ import {
   Command,
   LifeBuoy,
   Send,
-  Settings2,
+  Settings,
   SquareTerminal,
+  Activity
 } from "lucide-react";
 
 import { NavMain } from "@/components/nav-main";
@@ -35,22 +36,21 @@ const navigationData = {
       items: [
         { title: "Upload", url: "/panel/upload" },
         { title: "Browse", url: "/panel/browse" },
-        { title: "Settings", url: "#" },
       ],
     },
     {
-      title: "Settings",
+      title: "Smart Analyze",
       url: "#",
-      icon: Settings2,
+      icon: Activity,
       items: [
-        { title: "General", url: "#" },
-        { title: "Team", url: "#" },
+        { title: "Improve Business", url: "#" },
+        { title: "KePin Agent", url: "#" },
       ],
     },
+
   ],
   navSecondary: [
-    { title: "Support", url: "#", icon: LifeBuoy },
-    { title: "Feedback", url: "#", icon: Send },
+    { title: "Settings", url: "#", icon: Settings },
   ],
 };
 
@@ -63,6 +63,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     id: "",
     name: "Loading...",
     email: "Checking session...",
+    plan: "Loading...",
     avatar: "https://github.com/shadcn.png",
   });
 
@@ -86,6 +87,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           id: data.id ? String(data.id) : "", 
           name: data.name || "User",
           email: data.email || "No Email",
+          plan: data.plan || "Basic",
           avatar: data.avatar || "https://github.com/shadcn.png",
         });
       } else if (response.status === 401) {
@@ -117,7 +119,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 </div>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-semibold text-sidebar-foreground">Oryphem</span>
-                  <span className="truncate text-xs text-muted-foreground">Keuangan Pintar</span>
+                  <span className="truncate text-xs text-muted-foreground">Beta Version</span>
                 </div>
               </a>
             </SidebarMenuButton>

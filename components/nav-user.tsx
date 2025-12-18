@@ -35,6 +35,7 @@ interface NavUserProps {
     id: string;
     name: string;
     email: string;
+    plan: string;
     avatar: string;
   }
 }
@@ -83,7 +84,7 @@ export function NavUser({ user }: NavUserProps) {
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-medium">{user.name}</span>
-                <span className="truncate text-xs text-muted-foreground">{user.email}</span>
+                <span className="truncate text-xs text-muted-foreground">{user.plan}</span>
               </div>
               <ChevronsUpDown className="ml-auto size-4" />
             </SidebarMenuButton>

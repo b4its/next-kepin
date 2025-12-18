@@ -100,7 +100,7 @@ function UploadForm() {
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-xl font-bold">
           <Upload className="h-6 w-6 text-primary" />
-          Panel Unggah Dokumen
+          Upload Data Dokumen
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -132,7 +132,7 @@ function UploadForm() {
                 <Upload className="h-8 w-8" />
               </div>
               <p className="font-medium">Klik untuk memilih file</p>
-              <p className="text-xs text-muted-foreground mt-1">PDF atau Gambar (Maks. 20MB)</p>
+              <p className="text-xs text-muted-foreground mt-1">CSV, PDF, XLSX, dan Gambar(Maks. 2MB)</p>
             </label>
           )}
           
@@ -201,7 +201,7 @@ export default function Page() {
                 </BreadcrumbItem>
                 <BreadcrumbSeparator className="hidden md:block" />
                 <BreadcrumbItem>
-                  <BreadcrumbPage>Browse</BreadcrumbPage>
+                  <BreadcrumbPage>Upload</BreadcrumbPage>
                 </BreadcrumbItem>
               </BreadcrumbList>
             </Breadcrumb>
