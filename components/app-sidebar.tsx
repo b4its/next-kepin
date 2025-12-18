@@ -33,8 +33,8 @@ const navigationData = {
       icon: SquareTerminal,
       isActive: true,
       items: [
+        { title: "Upload", url: "/panel/upload" },
         { title: "Browse", url: "/panel/browse" },
-        { title: "Starred", url: "#" },
         { title: "Settings", url: "#" },
       ],
     },
