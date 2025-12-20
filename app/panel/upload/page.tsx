@@ -83,7 +83,7 @@ function UploadForm() {
         
         // Redirect ke halaman analyse setelah 1.5 detik
         setTimeout(() => {
-            router.push("/panel/browse"); 
+            router.push("/panel/analyze"); 
         }, 1500);
         
       } else {

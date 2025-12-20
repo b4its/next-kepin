@@ -4,7 +4,7 @@ import * as React from "react";
 import { useEffect, useState, useCallback } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import {
-  Command,
+  BrainCircuit,
   LifeBuoy,
   Send,
   Settings,
@@ -35,7 +35,7 @@ const navigationData = {
       isActive: true,
       items: [
         { title: "Upload", url: "/panel/upload" },
-        { title: "Browse", url: "/panel/browse" },
+        { title: "Analyze", url: "/panel/analyze" },
       ],
     },
     {
@@ -115,7 +115,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             <SidebarMenuButton size="lg" asChild>
               <a href="/panel/dashboard">
                 <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
-                  <Command className="size-4" />
+                  <BrainCircuit className="size-4" />
                 </div>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-semibold text-sidebar-foreground">Oryphem</span>
